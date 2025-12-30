@@ -3,13 +3,21 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from .auth import is_user_authorized
 from .lldap import create_user, add_user_to_group, delete_user, find_username_by_email, update_user_password
-from .config import ADMIN_GROUP_ID
+from .config import ADMIN_GROUP_ID, SERVICES_DESCRIPTION
 from .utils import generate_random_password
 
+
+#### VARIABLE DEFINITION
 # --- UTILIDAD: OBTENER ID ---
 async def get_id_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     await update.effective_message.reply_text(f"🆔 ID: `{chat_id}`", parse_mode='Markdown')
+
+# --- UTILIDAD: INFO ---
+async def info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    await update.effective_message.reply_text(SERVICES_DESCRIPTION, parse_mode='Markdown')
+
 
 # --- BIENVENIDA AL GRUPO ---
 async def new_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):

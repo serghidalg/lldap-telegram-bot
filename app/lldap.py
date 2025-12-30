@@ -20,15 +20,15 @@ def create_user(username: str, email: str, password: str, first_name: str, last_
     success, output = _run_shell_command(cmd_add)
     if not success: return False, output
 
-    if telegram_id and telegram_username:
-        cmd_update = f"lldap-cli user update set {username} telegram-id '{telegram_id}'"
-        _run_shell_command(cmd_update)
-        cmd_update = f"lldap-cli user update set {username} telegram '{telegram_username}'"
-        _run_shell_command(cmd_update)
+    if telegram_username:
+        cmd_telegram_username = f"lldap-cli user update set {username} telegram '{telegram_username}'"
+        _run_shell_command(cmd_telegram_username)
+            
+    if telegram_id:
+        cmd_telegram_id = f"lldap-cli user update set {username} telegram-id '{telegram_id}'"
+        _run_shell_command(cmd_telegram_id) 
             
     return True, output
-
-
 
 def add_user_to_group(username: str, group_name: str) -> tuple[bool, str]:
     cmd = f"lldap-cli user group add {username} {group_name}"

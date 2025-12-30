@@ -10,7 +10,7 @@ def main():
     # Comandos
     app.add_handler(CommandHandler('start', start_handler))
     app.add_handler(CommandHandler('crear', create_user_handler))
-    app.add_handler(CommandHandler('reseteo_password', reset_password_handler))
+    app.add_handler(CommandHandler('reset', reset_password_handler))
     app.add_handler(CommandHandler('baja', delete_user_handler))
     app.add_handler(CommandHandler('getid', get_id_handler))
     

@@ -100,7 +100,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         try:
             msg_group = (
                 f"📢 **Nuevo usuario registrado**\n"
-                f"El usuario de Telegram **{telegram_user_name}** ha creado la cuenta `{username}`."
+                f"El usuario de Telegram **{telegram_user_name}** acaba de crear una cuenta."
             )
             await context.bot.send_message(chat_id=ADMIN_GROUP_ID, text=msg_group, parse_mode=ParseMode.MARKDOWN)
         except Exception:
@@ -130,12 +130,6 @@ async def delete_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     if success:
         await update.effective_message.reply_text(f"✅ Usuario `{username_found}` eliminado.")
-        if ADMIN_GROUP_ID:
-            await context.bot.send_message(
-                chat_id=ADMIN_GROUP_ID, 
-                text=f"🗑️ **Usuario eliminado:** `{username_found}` (Email: {input_email})", 
-                parse_mode=ParseMode.MARKDOWN
-            )
     else:
         await update.effective_message.reply_text(f"❌ Error al eliminar:\n{output}")
 
@@ -167,7 +161,7 @@ async def reset_password_handler(update: Update, context: ContextTypes.DEFAULT_T
             f"✅ **Contraseña Restaurada**\n\n"
             f"Se ha generado una nueva clave para el usuario `{username_found}`:\n\n"
             f"🔑 Nueva Contraseña: `{new_password}`\n\n"
-            f"⚠️ _Por favor, cámbiala [aquí](https://users.pyam.org) lo antes posible._"
+            f"⚠️ _Por favor, cámbiala_ [aquí](https://users.pyam.org) _lo antes posible._"
         )
         await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN)
     else:

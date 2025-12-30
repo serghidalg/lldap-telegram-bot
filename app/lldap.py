@@ -15,23 +15,20 @@ def _run_shell_command(command: str) -> tuple[bool, str]:
 
 def create_user(username: str, email: str, password: str, first_name: str, last_name: str, telegram_id: str = None, telegram_username: str = None) -> tuple[bool, str]:
     display_name = f"{first_name} {last_name}"
-    # IMPORTANTE: El flag -p va antes de la contraseña
     cmd_add = f"lldap-cli user add {username} {email} -p '{password}' -f \"{first_name}\" -l \"{last_name}\" -d \"{username}\""
     
     success, output = _run_shell_command(cmd_add)
     if not success: return False, output
 
-    if telegram_id:
+    if telegram_id and telegram_username:
         cmd_update = f"lldap-cli user update set {username} telegram-id '{telegram_id}'"
-        _run_shell_command(cmd_update) # Ignoramos error en atributo opcional
+        _run_shell_command(cmd_update)
+        cmd_update = f"lldap-cli user update set {username} telegram '{telegram_username}'"
+        _run_shell_command(cmd_update)
             
     return True, output
 
-    if telegram_username:
-        cmd_update = f"lldap-cli user update set {username} telegram '{telegram_username}'"
-        _run_shell_command(cmd_update) # Ignoramos error en atributo opcional
-            
-    return True, output
+
 
 def add_user_to_group(username: str, group_name: str) -> tuple[bool, str]:
     cmd = f"lldap-cli user group add {username} {group_name}"

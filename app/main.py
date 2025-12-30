@@ -1,6 +1,6 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 from .config import TELEGRAM_TOKEN, logger
-from .handlers import start_handler, create_user_handler, delete_user_handler, get_id_handler, new_member_handler
+from .handlers import start_handler, create_user_handler, delete_user_handler, get_id_handler, new_member_handler, reset_password_handler
 
 def main():
     logger.info("Starting bot (Stateless Mode)...")

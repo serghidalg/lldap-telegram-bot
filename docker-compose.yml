@@ -1,0 +1,11 @@
+services:
+  lldap-telegram-bot:
+    build: .
+    container_name: lldap-telegram-bot
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - ADMIN_GROUP_ID=${ADMIN_GROUP_ID}
+      - LLDAP_URL=${LLDAP_URL}
+      - LLDAP_USER=${LLDAP_USER}
+      - LLDAP_PASSWORD=${LLDAP_PASSWORD}

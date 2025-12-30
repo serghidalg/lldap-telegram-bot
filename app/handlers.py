@@ -2,7 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from .auth import is_user_authorized
-from .lldap import create_user, add_user_to_group, delete_user, find_username_by_email
+from .lldap import create_user, add_user_to_group, delete_user, find_username_by_email, update_user_password
 from .config import ADMIN_GROUP_ID
 from .utils import generate_random_password
 
@@ -92,7 +92,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         f"🔐 **TUS CREDENCIALES:**\n"
         f"👤 Usuario: `{username}`\n"
         f"🔑 Contraseña: `{password}`\n\n"
-        f"⚠️ _Guarda esta contraseña._\n\n"
+        f"⚠️ _Por favor, cámbiala [aquí](https://users.pyam.org) o guárdala en un lugar seguro._"
         f"🔗 **Acceso directo:**\n"
         f"📺 [Jellyfin](https://jellyfin.serghidalg.com)\n"
         f"🎬 [Jellyseer](https://jellyseer.serghidalg.com)\n"
@@ -146,3 +146,42 @@ async def delete_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             )
     else:
         await update.effective_message.reply_text(f"❌ Error al eliminar:\n{output}")
+
+# --- RESTAURAR CONTRASEÑA ---
+async def reset_password_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_authorized(update, context):
+        return
+
+    args = context.args
+    if len(args) < 1:
+        await update.effective_message.reply_text("⚠️ Uso: `/reset email@ejemplo.com`")
+        return
+
+    input_email = args[0]
+    
+    await update.effective_message.reply_text(f"🔎 Buscando usuario con email `{input_email}`...")
+
+    # 1. Buscar el username asociado al email
+    username_found = find_username_by_email(input_email)
+    
+    if not username_found:
+        await update.effective_message.reply_text(f"❌ No he encontrado ningún usuario con el email `{input_email}`.")
+        return
+
+    # 2. Generar nueva contraseña
+    new_password = generate_random_password()
+    
+    # 3. Actualizar en LLDAP
+    success, output = update_user_password(username_found, new_password)
+
+    if success:
+        # Mensaje PRIVADO con la nueva contraseña
+        msg_private = (
+            f"✅ **Contraseña Restaurada**\n\n"
+            f"Se ha generado una nueva clave para el usuario `{username_found}`:\n\n"
+            f"🔑 Nueva Contraseña: `{new_password}`\n\n"
+            f"⚠️ _Por favor, cámbiala [aquí](https://users.pyam.org) o guárdala en un lugar seguro._"
+        )
+        await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN)
+    else:
+        await update.effective_message.reply_text(f"❌ Error al actualizar la contraseña:\n{output}")

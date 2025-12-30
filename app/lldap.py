@@ -73,3 +73,12 @@ def find_username_by_email(email: str) -> str | None:
             if len(parts) > 0:
                 return parts[0]
     return None
+
+def update_user_password(username: str, new_password: str) -> tuple[bool, str]:
+    """
+    Actualiza la contraseña de un usuario existente.
+    Comando: lldap-cli user update set <UID> password <VALUE>
+    """
+    # Importante: Envolver la contraseña en comillas simples para evitar errores de shell
+    cmd = f"lldap-cli user update set {username} password '{new_password}'"
+    return _run_shell_command(cmd)

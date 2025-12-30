@@ -19,7 +19,7 @@ SERVICES_DESCRIPTION = (
     f"pyam es un servidor autogestionado que tiene como fin buscar soluciones populares y alternativas para gestionar la cultura en sus distintas formas. Aunque nace de un interés individual, pretende crecer con el objetivo de dejar de financiar aquello que va contra nuestros intereses colectivos."
 )
 SERVICES_LIST = (
-    f"📺 [Jellyfin](https://jellyfin.pyam.org): ver series y pelis\n"
+    f"📺 [Jellyfin](https://jellyfin.pyam.org): ver series y pelis (se recomienda instalar la aplicación para que todo funcione correctamente)\n"
     f"🎬 [Jellyseerr](https://jellyseer.pyam.org): solicitar series y pelis\n"
     f"🎧 [Navidrome](https://musicx.pyam.org): escuchar música\n"
     f"🎶 [Deemix](https://getmusic.pyam.org): solicitar nueva música\n"

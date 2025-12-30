@@ -23,6 +23,7 @@ SERVICES_LIST = (
     f"🎬 [Jellyseerr](https://jellyseer.pyam.org): solicitar series y pelis\n"
     f"🎧 [Navidrome](https://musicx.pyam.org): escuchar música\n"
     f"🎶 [Deemix](https://getmusic.pyam.org): solicitar nueva música\n"
+    f"🔐 [LLDAP](https://users.pyam.org/reset-password/step1): cambia tu contraseña"
 )
 
 # Validation

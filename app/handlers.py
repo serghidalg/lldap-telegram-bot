@@ -37,12 +37,11 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👋 **Gestión de Usuarios LLDAP**\n\n"
         "🔹 Para crear: `/crear Nombre Apellido email`\n"
         "🔹 Para borrar: `/baja email@usuario.com`\n"
-        "🔹 Ver ID Grupo: `/getid`\n"
-        "_(El borrado se hace por email)_",
+        "🔹 Restaurar contraseña: `/reset email@usuario.com`\n",
         parse_mode=ParseMode.MARKDOWN
     )
 
-# --- CREAR USUARIO (CON PASSWORD, NOMBRE, APELLIDO Y TELEGRAM ID) ---
+# --- CREAR USUARIO ---
 async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_user_authorized(update, context):
         return
@@ -52,54 +51,48 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.effective_message.reply_text("⚠️ Uso: `/crear Nombre Apellido email@ejemplo.com`")
         return
 
-    # Recogemos los datos limpios
-    first_name = args[0]
-    last_name = args[1]
-    email = args[2]
+    # Limpiamos los datos: strip() quita espacios accidentales
+    first_name = args[0].strip()
+    last_name = args[1].strip()
+    email = args[2].strip().lower() # Guardamos siempre en minúsculas
     
-    # Username: nombre.apellido
     username = f"{first_name}.{last_name}".lower()
     
-    # ID de Telegram para el atributo custom
+    # ID de Telegram (Guardamos el ID numérico que es más seguro y único que el nombre)
     telegram_id_value = str(update.effective_user.id)
     telegram_user_name = update.effective_user.first_name
     
-    # Generar password
     password = generate_random_password()
 
     await update.effective_message.reply_text(f"⏳ Creando usuario `{username}`...")
 
-    # Llamamos a create_user pasando first_name y last_name por separado
     success, output = create_user(
         username=username, 
         email=email, 
         password=password, 
         first_name=first_name, 
         last_name=last_name, 
-        telegram_id=telegram_user_name
+        telegram_id=telegram_id_value # Usamos el ID numérico
     )
     
     if not success:
         await update.effective_message.reply_text(f"❌ Error creando usuario:\n{output}")
         return
 
-    # Añadir al grupo Jellyfin
     add_user_to_group(username, "jellyfin")
 
-    # Mensaje privado con credenciales
     msg_private = (
         f"✅ **¡Cuenta Creada Exitosamente!**\n\n"
         f"🔐 **TUS CREDENCIALES:**\n"
         f"👤 Usuario: `{username}`\n"
         f"🔑 Contraseña: `{password}`\n\n"
-        f"⚠️ _Por favor, cámbiala [aquí](https://users.pyam.org) o guárdala en un lugar seguro._"
+        f"⚠️ _Por favor, cámbiala [aquí](https://users.serghidalg.com) o guárdala en un lugar seguro._\n\n"
         f"🔗 **Acceso directo:**\n"
         f"📺 [Jellyfin](https://jellyfin.serghidalg.com)\n"
         f"🎬 [Jellyseer](https://jellyseer.serghidalg.com)\n"
     )
     await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
-    # Notificación al Grupo
     if ADMIN_GROUP_ID:
         try:
             msg_group = (
@@ -110,7 +103,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         except Exception:
             pass
 
-# --- BAJA USUARIO (POR EMAIL) ---
+# --- BAJA USUARIO ---
 async def delete_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_user_authorized(update, context):
         return
@@ -120,28 +113,24 @@ async def delete_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.effective_message.reply_text("⚠️ Uso: `/baja email@ejemplo.com`")
         return
 
-    input_email = args[0]
+    input_email = args[0].strip().lower()
     
     await update.effective_message.reply_text(f"🔎 Buscando usuario con email `{input_email}`...")
 
-    # 1. Buscar el username asociado a ese email
     username_found = find_username_by_email(input_email)
     
     if not username_found:
-        await update.effective_message.reply_text(f"❌ No he encontrado ningún usuario con el email `{input_email}` en LLDAP.")
+        await update.effective_message.reply_text(f"❌ No he encontrado ningún usuario con el email `{input_email}`.")
         return
 
-    # 2. Proceder al borrado usando el username encontrado
     success, output = delete_user(username_found)
 
     if success:
-        await update.effective_message.reply_text(f"✅ El usuario `{username_found}` (Email: {input_email}) ha sido eliminado.")
-        
-        # Log al grupo
+        await update.effective_message.reply_text(f"✅ Usuario `{username_found}` eliminado.")
         if ADMIN_GROUP_ID:
             await context.bot.send_message(
                 chat_id=ADMIN_GROUP_ID, 
-                text=f"🗑️ **Usuario eliminado:** `{username_found}` (solicitado vía email)", 
+                text=f"🗑️ **Usuario eliminado:** `{username_found}` (Email: {input_email})", 
                 parse_mode=ParseMode.MARKDOWN
             )
     else:
@@ -157,30 +146,25 @@ async def reset_password_handler(update: Update, context: ContextTypes.DEFAULT_T
         await update.effective_message.reply_text("⚠️ Uso: `/reset email@ejemplo.com`")
         return
 
-    input_email = args[0]
+    input_email = args[0].strip().lower()
     
     await update.effective_message.reply_text(f"🔎 Buscando usuario con email `{input_email}`...")
 
-    # 1. Buscar el username asociado al email
     username_found = find_username_by_email(input_email)
     
     if not username_found:
         await update.effective_message.reply_text(f"❌ No he encontrado ningún usuario con el email `{input_email}`.")
         return
 
-    # 2. Generar nueva contraseña
     new_password = generate_random_password()
-    
-    # 3. Actualizar en LLDAP
     success, output = update_user_password(username_found, new_password)
 
     if success:
-        # Mensaje PRIVADO con la nueva contraseña
         msg_private = (
             f"✅ **Contraseña Restaurada**\n\n"
             f"Se ha generado una nueva clave para el usuario `{username_found}`:\n\n"
             f"🔑 Nueva Contraseña: `{new_password}`\n\n"
-            f"⚠️ _Por favor, cámbiala [aquí](https://users.pyam.org) o guárdala en un lugar seguro._"
+            f"⚠️ _Por favor, cámbiala [aquí](https://users.serghidalg.com) lo antes posible._"
         )
         await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN)
     else:

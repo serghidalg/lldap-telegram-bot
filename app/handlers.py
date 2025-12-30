@@ -72,7 +72,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         password=password, 
         first_name=first_name, 
         last_name=last_name,
-        telegram_username=telegram_user_name 
+        telegram_username=telegram_user_name,
         telegram_id=telegram_id_value # Usamos el ID numérico
     )
     

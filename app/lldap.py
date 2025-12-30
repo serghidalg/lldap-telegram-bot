@@ -43,13 +43,19 @@ def update_user_password(username: str, new_password: str) -> tuple[bool, str]:
     return _run_shell_command(cmd)
 
 def find_username_by_email(email: str) -> str | None:
-    cmd = (
-        f"lldap-cli user info {email} | "
-        "awk 'NR>2 {print $1}'"
+    success, output = _run_shell_command(
+        f"lldap-cli user info {email}"
     )
 
-    success, output = _run_shell_command(cmd)
-    if not success:
+    if not success or not output:
         return None
 
-    return output.strip() or None
+    for i, line in enumerate(output.splitlines()):
+        if i < 2:
+            continue
+
+        parts = line.split()
+        if len(parts) >= 2 and parts[1].lower() == email.lower():
+            return parts[0]
+
+    return None

@@ -28,15 +28,12 @@ def create_user(username: str, email: str, password: str, first_name: str, last_
     Crea un usuario usando -f (Firstname), -l (Lastname) y -d (Displayname).
     Opcionalmente setea el atributo custom 'telegram'.
     """
-    
-    # Construimos el Display Name juntando nombre y apellido
-    display_name = f"{first_name} {last_name}"
 
     # COMANDO ACTUALIZADO:
     # Añadimos -f "{first_name}" y -l "{last_name}"
     cmd_add = (
         f"lldap-cli user add {username} {email} -p \"{password}\" "
-        f"-f \"{first_name}\" -l \"{last_name}\" -d \"{display_name}\""
+        f"-f \"{first_name}\" -l \"{last_name}\" -d \"{username}\""
     )
     
     success, output = _run_shell_command(cmd_add)

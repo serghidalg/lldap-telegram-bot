@@ -97,10 +97,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         f"🔑 Contraseña: `{password}`\n\n"
         f"⚠️ _Por favor, cámbiala_ [aquí](https://users.pyam.org) _o guárdala en un lugar seguro._\n\n"
         f"🔗 **Acceso directo:**\n"
-        f"📺 [Ver series y pelis](https://jellyfin.pyam.org)\n"
-        f"🎬 [Solicitar series y pelis](https://jellyseer.pyam.org)\n"
-        f"🎧 [Escuchar música](https://musicx.pyam.org)\n"
-        f"🎶 [Solicitar música](https://getmusic.pyam.org)\n"
+        f"{SERVICES_DESCRIPTION}"
     )
     await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 

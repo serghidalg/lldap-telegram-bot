@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y curl iputils-ping jq wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl iputils-ping jq wget bsdextrautils && rm -rf /var/lib/apt/lists/*
 
 # Install lldap-set-password
 RUN wget https://download.opensuse.org/repositories/home:/Masgalor:/LLDAP/Debian_12/amd64/lldap-set-password_0.6.2-1+1.1_amd64.deb \

@@ -9,4 +9,4 @@ services:
       - LLDAP_URL=${LLDAP_URL}
       - LLDAP_USER=${LLDAP_USER}
       - LLDAP_PASSWORD=${LLDAP_PASSWORD}
-    #network_mode: host # Needed if LLDAP is somewhere else in your network
+    network_mode: host # Needed if LLDAP is somewhere else in your network

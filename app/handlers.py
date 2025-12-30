@@ -51,83 +51,60 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.effective_message.reply_text("⚠️ Uso: `/crear Nombre Apellido email@ejemplo.com`")
         return
 
-    first_name, last_name, email = args[0], args[1], args[2]
-    username = f"{first_name}.{last_name}".lower()
-    display_name = f"{first_name} {last_name}"
-    telegram_user = update.effective_user.first_name
+    # Recogemos los datos limpios
+    first_name = args[0]
+    last_name = args[1]
+    email = args[2]
     
-    # 1. Generar contraseña aleatoria
+    username = f"{first_name}.{last_name}".lower()
+    
+    # ID de Telegram para el atributo custom
+    telegram_id_value = str(update.effective_user.id)
+    telegram_user_name = update.effective_user.first_name
+    
+    # Generar password
     password = generate_random_password()
 
-    await update.effective_message.reply_text(f"⏳ Creando usuario `{username}` con contraseña segura...")
+    await update.effective_message.reply_text(f"⏳ Creando usuario `{username}`...")
 
-    # 2. Crear en LLDAP pasando la contraseña
-    success, output = create_user(username, email, password, display_name, first_name, last_name)
+    # --- CAMBIO AQUÍ ---
+    # Llamamos a create_user pasando first_name y last_name por separado
+    success, output = create_user(
+        username=username, 
+        email=email, 
+        password=password, 
+        first_name=first_name, 
+        last_name=last_name, 
+        telegram_id=telegram_id_value
+    )
+    
     if not success:
         await update.effective_message.reply_text(f"❌ Error creando usuario:\n{output}")
         return
 
-    # 3. Añadir al grupo Jellyfin
+    # Añadir al grupo Jellyfin
     add_user_to_group(username, "jellyfin")
 
-    # 4. Mensaje con CREDENCIALES (Privado)
+    # Mensaje privado
     msg_private = (
         f"✅ **¡Cuenta Creada Exitosamente!**\n\n"
         f"🔐 **TUS CREDENCIALES:**\n"
         f"👤 Usuario: `{username}`\n"
         f"🔑 Contraseña: `{password}`\n\n"
-        f"⚠️ _Guarda esta contraseña, no se puede recuperar, solo cambiar._\n\n"
+        f"⚠️ _Guarda esta contraseña._\n\n"
         f"🔗 **Acceso directo:**\n"
-        f"📺 [Jellyfin (Ver contenido)](https://jellyfin.pyam.org)\n"
-        f"🎬 [Jellyseer (Pedir contenido)](https://jellyseer.pyam.org)\n"
+        f"📺 [Jellyfin](https://jellyfin.serghidalg.com)\n"
+        f"🎬 [Jellyseer](https://jellyseer.serghidalg.com)\n"
     )
-    # Hacemos que el usuario pueda copiar la contraseña haciendo click (Code style)
     await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
-    # 5. Notificación al Grupo (SIN la contraseña por seguridad)
+    # Notificación al Grupo
     if ADMIN_GROUP_ID:
         try:
             msg_group = (
                 f"📢 **Nuevo usuario registrado**\n"
-                f"El usuario de Telegram **{telegram_user}** ha creado la cuenta `{username}` asociada al email `{email}`."
+                f"El usuario de Telegram **{telegram_user_name}** ha creado la cuenta `{username}`."
             )
             await context.bot.send_message(chat_id=ADMIN_GROUP_ID, text=msg_group, parse_mode=ParseMode.MARKDOWN)
         except Exception:
             pass
-
-# --- BAJA USUARIO (POR EMAIL) ---
-async def delete_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not await is_user_authorized(update, context):
-        return
-
-    args = context.args
-    if len(args) < 1:
-        await update.effective_message.reply_text("⚠️ Uso: `/baja email@ejemplo.com`")
-        return
-
-    input_email = args[0]
-    
-    await update.effective_message.reply_text(f"🔎 Buscando usuario con email `{input_email}`...")
-
-    # 1. Buscar el username asociado a ese email
-    username_found = find_username_by_email(input_email)
-    
-    if not username_found:
-        await update.effective_message.reply_text(f"❌ No he encontrado ningún usuario con el email `{input_email}` en LLDAP.")
-        return
-
-    # 2. Proceder al borrado usando el username encontrado
-    success, output = delete_user(username_found)
-
-    if success:
-        await update.effective_message.reply_text(f"✅ El usuario `{username_found}` (Email: {input_email}) ha sido eliminado.")
-        
-        # Log al grupo
-        if ADMIN_GROUP_ID:
-            await context.bot.send_message(
-                chat_id=ADMIN_GROUP_ID, 
-                text=f"🗑️ **Usuario eliminado:** `{username_found}`", 
-                parse_mode=ParseMode.MARKDOWN
-            )
-    else:
-        await update.effective_message.reply_text(f"❌ Error al eliminar:\n{output}")

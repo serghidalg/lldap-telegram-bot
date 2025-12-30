@@ -13,7 +13,7 @@ def _run_shell_command(command: str) -> tuple[bool, str]:
     except subprocess.CalledProcessError as e:
         return False, e.stderr
 
-def create_user(username: str, email: str, password: str, first_name: str, last_name: str, telegram_id: str = None) -> tuple[bool, str]:
+def create_user(username: str, email: str, password: str, first_name: str, last_name: str, telegram_id: str = None, telegram_username: str = None) -> tuple[bool, str]:
     display_name = f"{first_name} {last_name}"
     # IMPORTANTE: El flag -p va antes de la contraseña
     cmd_add = f"lldap-cli user add {username} {email} -p '{password}' -f \"{first_name}\" -l \"{last_name}\" -d \"{username}\""
@@ -23,6 +23,12 @@ def create_user(username: str, email: str, password: str, first_name: str, last_
 
     if telegram_id:
         cmd_update = f"lldap-cli user update set {username} telegram '{telegram_id}'"
+        _run_shell_command(cmd_update) # Ignoramos error en atributo opcional
+            
+    return True, output
+
+    if telegram_username:
+        cmd_update = f"lldap-cli user update set {username} telegram '{telegram_username}'"
         _run_shell_command(cmd_update) # Ignoramos error en atributo opcional
             
     return True, output

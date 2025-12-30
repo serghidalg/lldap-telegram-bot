@@ -23,7 +23,7 @@ async def new_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.effective_message.reply_text(
             f"👋 ¡Bienvenid@ {member.first_name}!\n\n"
             "Para acceder a los servicios, necesitas crear una cuenta.\n"
-            "Pulsa el botón de abajo para que el bot te genere tus credenciales.",
+            "Pulsa el botón de abajo para que el bot genere tus credenciales.",
             reply_markup=reply_markup
         )
 
@@ -71,8 +71,9 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         email=email, 
         password=password, 
         first_name=first_name, 
-        last_name=last_name, 
-        telegram_id=telegram_user_name # Usamos el ID numérico
+        last_name=last_name,
+        telegram_username=telegram_user_name 
+        telegram_id=telegram_id_value # Usamos el ID numérico
     )
     
     if not success:

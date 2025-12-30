@@ -6,6 +6,12 @@ from .lldap import create_user, add_user_to_group, delete_user, find_username_by
 from .config import ADMIN_GROUP_ID
 from .utils import generate_random_password
 
+# --- FUNCION QUE FALTABA (FIX) ---
+async def get_id_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    await update.effective_message.reply_text(f"🆔 ID: `{chat_id}`", parse_mode='Markdown')
+
+    
 # --- BIENVENIDA AL GRUPO ---
 async def new_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for member in update.effective_message.new_chat_members:

@@ -16,7 +16,7 @@ def _run_shell_command(command: str) -> tuple[bool, str]:
 def create_user(username: str, email: str, password: str, first_name: str, last_name: str, telegram_id: str = None) -> tuple[bool, str]:
     display_name = f"{first_name} {last_name}"
     # IMPORTANTE: El flag -p va antes de la contraseña
-    cmd_add = f"lldap-cli user add {username} {email} -p '{password}' -f \"{first_name}\" -l \"{last_name}\" -d \"{display_name}\""
+    cmd_add = f"lldap-cli user add {username} {email} -p '{password}' -f \"{first_name}\" -l \"{last_name}\" -d \"{username}\""
     
     success, output = _run_shell_command(cmd_add)
     if not success: return False, output

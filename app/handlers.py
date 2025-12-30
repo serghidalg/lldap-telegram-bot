@@ -21,7 +21,7 @@ async def new_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         await update.effective_message.reply_text(
-            f"👋 ¡Bienvenido {member.first_name}!\n\n"
+            f"👋 ¡Bienvenid@ {member.first_name}!\n\n"
             "Para acceder a los servicios, necesitas crear una cuenta.\n"
             "Pulsa el botón de abajo para que el bot te genere tus credenciales.",
             reply_markup=reply_markup
@@ -86,10 +86,12 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         f"🔐 **TUS CREDENCIALES:**\n"
         f"👤 Usuario: `{username}`\n"
         f"🔑 Contraseña: `{password}`\n\n"
-        f"⚠️ _Por favor, cámbiala [aquí](https://users.serghidalg.com) o guárdala en un lugar seguro._\n\n"
+        f"⚠️ _Por favor, cámbiala_ [aquí](https://users.pyam.org) _o guárdala en un lugar seguro._\n\n"
         f"🔗 **Acceso directo:**\n"
-        f"📺 [Jellyfin](https://jellyfin.serghidalg.com)\n"
-        f"🎬 [Jellyseer](https://jellyseer.serghidalg.com)\n"
+        f"📺 [Ver series y pelis](https://jellyfin.pyam.org)\n"
+        f"🎬 [Solicitar series y pelis](https://jellyseer.pyam.org)\n"
+        f"🎧 [Escuchar música](https://musicx.pyam.org)\n"
+        f"🎶 [Solicitar música](https://getmusic.pyam.org)\n"
     )
     await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
@@ -164,7 +166,7 @@ async def reset_password_handler(update: Update, context: ContextTypes.DEFAULT_T
             f"✅ **Contraseña Restaurada**\n\n"
             f"Se ha generado una nueva clave para el usuario `{username_found}`:\n\n"
             f"🔑 Nueva Contraseña: `{new_password}`\n\n"
-            f"⚠️ _Por favor, cámbiala [aquí](https://users.serghidalg.com) lo antes posible._"
+            f"⚠️ _Por favor, cámbiala [aquí](https://users.pyam.org) lo antes posible._"
         )
         await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN)
     else:

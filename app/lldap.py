@@ -22,7 +22,7 @@ def create_user(username: str, email: str, password: str, first_name: str, last_
     if not success: return False, output
 
     if telegram_id:
-        cmd_update = f"lldap-cli user update set {username} telegram '{telegram_id}'"
+        cmd_update = f"lldap-cli user update set {username} telegram '{telegram_user_name}'"
         _run_shell_command(cmd_update) # Ignoramos error en atributo opcional
             
     return True, output

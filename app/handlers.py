@@ -11,7 +11,7 @@ async def get_id_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     await update.effective_message.reply_text(f"🆔 ID: `{chat_id}`", parse_mode='Markdown')
 
-    
+
 # --- BIENVENIDA AL GRUPO ---
 async def new_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for member in update.effective_message.new_chat_members:
@@ -62,7 +62,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     await update.effective_message.reply_text(f"⏳ Creando usuario `{username}` con contraseña segura...")
 
     # 2. Crear en LLDAP pasando la contraseña
-    success, output = create_user(username, email, password, display_name)
+    success, output = create_user(username, email, password, display_name, first_name, last_name)
     if not success:
         await update.effective_message.reply_text(f"❌ Error creando usuario:\n{output}")
         return

@@ -25,10 +25,10 @@ def _run_shell_command(command: str) -> tuple[bool, str]:
     except subprocess.CalledProcessError as e:
         return False, e.stderr
 
-def create_user(username: str, email: str, password: str, display_name: str) -> tuple[bool, str]:
+def create_user(username: str, email: str, password: str, display_name: str, first_name: str, last_name: str) -> tuple[bool, str]:
     # NOTE: lldap-cli syntax is usually: user add <username> <email> [password]
     # We wrap password in quotes to handle special characters
-    cmd = f"lldap-cli user add {username} {email} '{password}' -d \"{display_name}\""
+    cmd = f"lldap-cli user add {username} {email} '{password}' -d \"{display_name}\" -f {first_name} -l {last_name}"
     return _run_shell_command(cmd)
 
 def add_user_to_group(username: str, group_name: str) -> tuple[bool, str]:

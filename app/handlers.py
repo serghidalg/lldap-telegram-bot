@@ -6,11 +6,10 @@ from .lldap import create_user, add_user_to_group, delete_user, find_username_by
 from .config import ADMIN_GROUP_ID
 from .utils import generate_random_password
 
-# --- FUNCION QUE FALTABA (FIX) ---
+# --- UTILIDAD: OBTENER ID ---
 async def get_id_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     await update.effective_message.reply_text(f"🆔 ID: `{chat_id}`", parse_mode='Markdown')
-
 
 # --- BIENVENIDA AL GRUPO ---
 async def new_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -37,11 +36,13 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.effective_message.reply_text(
         "👋 **Gestión de Usuarios LLDAP**\n\n"
         "🔹 Para crear: `/crear Nombre Apellido email`\n"
-        "🔹 Para borrar: `/baja email@usuario.com`\n",
+        "🔹 Para borrar: `/baja email@usuario.com`\n"
+        "🔹 Ver ID Grupo: `/getid`\n"
+        "_(El borrado se hace por email)_",
         parse_mode=ParseMode.MARKDOWN
     )
 
-# --- CREAR USUARIO (CON CONTRASEÑA) ---
+# --- CREAR USUARIO (CON PASSWORD, NOMBRE, APELLIDO Y TELEGRAM ID) ---
 async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_user_authorized(update, context):
         return
@@ -56,6 +57,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     last_name = args[1]
     email = args[2]
     
+    # Username: nombre.apellido
     username = f"{first_name}.{last_name}".lower()
     
     # ID de Telegram para el atributo custom
@@ -67,7 +69,6 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     await update.effective_message.reply_text(f"⏳ Creando usuario `{username}`...")
 
-    # --- CAMBIO AQUÍ ---
     # Llamamos a create_user pasando first_name y last_name por separado
     success, output = create_user(
         username=username, 
@@ -85,7 +86,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Añadir al grupo Jellyfin
     add_user_to_group(username, "jellyfin")
 
-    # Mensaje privado
+    # Mensaje privado con credenciales
     msg_private = (
         f"✅ **¡Cuenta Creada Exitosamente!**\n\n"
         f"🔐 **TUS CREDENCIALES:**\n"
@@ -108,3 +109,40 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             await context.bot.send_message(chat_id=ADMIN_GROUP_ID, text=msg_group, parse_mode=ParseMode.MARKDOWN)
         except Exception:
             pass
+
+# --- BAJA USUARIO (POR EMAIL) ---
+async def delete_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_authorized(update, context):
+        return
+
+    args = context.args
+    if len(args) < 1:
+        await update.effective_message.reply_text("⚠️ Uso: `/baja email@ejemplo.com`")
+        return
+
+    input_email = args[0]
+    
+    await update.effective_message.reply_text(f"🔎 Buscando usuario con email `{input_email}`...")
+
+    # 1. Buscar el username asociado a ese email
+    username_found = find_username_by_email(input_email)
+    
+    if not username_found:
+        await update.effective_message.reply_text(f"❌ No he encontrado ningún usuario con el email `{input_email}` en LLDAP.")
+        return
+
+    # 2. Proceder al borrado usando el username encontrado
+    success, output = delete_user(username_found)
+
+    if success:
+        await update.effective_message.reply_text(f"✅ El usuario `{username_found}` (Email: {input_email}) ha sido eliminado.")
+        
+        # Log al grupo
+        if ADMIN_GROUP_ID:
+            await context.bot.send_message(
+                chat_id=ADMIN_GROUP_ID, 
+                text=f"🗑️ **Usuario eliminado:** `{username_found}` (solicitado vía email)", 
+                parse_mode=ParseMode.MARKDOWN
+            )
+    else:
+        await update.effective_message.reply_text(f"❌ Error al eliminar:\n{output}")

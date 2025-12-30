@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y curl iputils-ping && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl iputils-ping jq && rm -rf /var/lib/apt/lists/*
 
 # Install lldap-cli
 RUN curl -L https://raw.githubusercontent.com/Zepmann/lldap-cli/refs/heads/main/lldap-cli -o /usr/local/bin/lldap-cli \

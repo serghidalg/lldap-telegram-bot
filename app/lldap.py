@@ -35,7 +35,7 @@ def create_user(username: str, email: str, password: str, first_name: str, last_
     # COMANDO ACTUALIZADO:
     # Añadimos -f "{first_name}" y -l "{last_name}"
     cmd_add = (
-        f"lldap-cli user add {username} {email} '{password}' "
+        f"lldap-cli user add {username} {email} -p \"{password}\" "
         f"-f \"{first_name}\" -l \"{last_name}\" -d \"{display_name}\""
     )
     

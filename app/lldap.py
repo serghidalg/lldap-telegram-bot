@@ -43,27 +43,19 @@ def update_user_password(username: str, new_password: str) -> tuple[bool, str]:
     return _run_shell_command(cmd)
 
 def find_username_by_email(email: str) -> str | None:
-    """
-    Obtiene el user_id a partir del email usando:
-    lldap-cli user info <email>
-    (equivalente a: awk 'NR>2 {print $1}')
-    """
     success, output = _run_shell_command(
         f"lldap-cli user info {email}"
     )
 
-    if not success:
-        logger.error(f"Error obteniendo info del usuario {email}: {output}")
+    if not success or not output:
         return None
 
-    # Equivalente a NR>2
-    lines = output.splitlines()[2:]
-
-    for line in lines:
-        if not line.strip():
+    for i, line in enumerate(output.splitlines()):
+        if i < 2:
             continue
 
-        # Equivalente a {print $1}
-        return line.split()[0]
+        parts = line.split()
+        if len(parts) >= 2 and parts[1].lower() == email.lower():
+            return parts[0]
 
     return None

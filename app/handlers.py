@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from .auth import is_user_authorized
 from .lldap import create_user, add_user_to_group, delete_user, find_username_by_email, update_user_password
-from .config import ADMIN_GROUP_ID, SERVICES_DESCRIPTION
+from .config import ADMIN_GROUP_ID, SERVICES_LIST, SERVICES_DESCRIPTION
 from .utils import generate_random_password
 
 
@@ -13,7 +13,12 @@ async def get_id_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     await update.effective_message.reply_text(f"🆔 ID: `{chat_id}`", parse_mode='Markdown')
 
-# --- UTILIDAD: INFO ---
+# --- UTILIDAD: SERVICES ---
+async def services_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    await update.effective_message.reply_text(SERVICES_LIST, parse_mode='Markdown')
+
+# --- UTILIDAD: DESCRIPTION ---
 async def info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     await update.effective_message.reply_text(SERVICES_DESCRIPTION, parse_mode='Markdown')
@@ -43,9 +48,9 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.effective_message.reply_text(
         "👋 **Gestión de Usuarios LLDAP**\n\n"
-        "🔹 Para crear: `/crear Nombre Apellido email`\n"
-        "🔹 Para borrar: `/baja email@usuario.com`\n"
-        "🔹 Restaurar contraseña: `/reset email@usuario.com`\n",
+        " - Para crear: `/crear Nombre Apellido email`\n"
+        " - Para borrar: `/baja email@usuario.com`\n"
+        " - Restaurar contraseña: `/reset email@usuario.com`\n",
         parse_mode=ParseMode.MARKDOWN
     )
 
@@ -97,7 +102,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         f"🔑 Contraseña: `{password}`\n\n"
         f"⚠️ _Por favor, cámbiala_ [aquí](https://users.pyam.org) _o guárdala en un lugar seguro._\n\n"
         f"🔗 **Acceso directo:**\n"
-        f"{SERVICES_DESCRIPTION}"
+        f"{SERVICES_LIST}"
     )
     await update.effective_message.reply_text(msg_private, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 

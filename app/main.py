@@ -1,6 +1,6 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 from .config import TELEGRAM_TOKEN, logger
-from .handlers import start_handler, create_user_handler, delete_user_handler, get_id_handler, new_member_handler, reset_password_handler, info_handler
+from .handlers import start_handler, create_user_handler, delete_user_handler, get_id_handler, new_member_handler, reset_password_handler, services_handler, info_handler
 
 def main():
     logger.info("Starting bot (Stateless Mode)...")
@@ -12,7 +12,8 @@ def main():
     app.add_handler(CommandHandler('crear', create_user_handler))
     app.add_handler(CommandHandler('reset', reset_password_handler))
     app.add_handler(CommandHandler('baja', delete_user_handler))
-    app.add_handler(CommandHandler('info', info_handler))
+    app.add_handler(CommandHandler('servicios', services_handler))
+    app.add_handler(CommandHandler('info', info_handler))    
     app.add_handler(CommandHandler('getid', get_id_handler))
     
     # Detector de bienvenida (Nuevos miembros en el grupo)

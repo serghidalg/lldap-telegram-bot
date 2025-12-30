@@ -44,39 +44,26 @@ def update_user_password(username: str, new_password: str) -> tuple[bool, str]:
 
 def find_username_by_email(email: str) -> str | None:
     """
-    Busca un email en la lista de usuarios.
+    Obtiene el user_id a partir del email usando:
+    lldap-cli user info <email>
+    (equivalente a: awk 'NR>2 {print $1}')
     """
-    # Obtenemos la lista completa
-    success, output = _run_shell_command("lldap-cli user list")
-    if not success: 
-        logger.error(f"Error listando usuarios: {output}")
+    success, output = _run_shell_command(
+        f"lldap-cli user info {email}"
+    )
+
+    if not success:
+        logger.error(f"Error obteniendo info del usuario {email}: {output}")
         return None
 
-    search_email = email.lower().strip()
-    
-    # Recorremos línea a línea
-    for line in output.splitlines():
-        # Saltamos líneas vacías
-        if not line.strip(): continue
-        
-        # Convertimos la línea a minúsculas para buscar sin importar mayúsculas
-        line_lower = line.lower()
-        
-        # Verificamos si el email está en la línea
-        if search_email in line_lower:
-            parts = line.split()
-            # La estructura suele ser: UID EMAIL ...
-            # Si parts[0] existe, ese es el username
-            if len(parts) > 0:
-                # Extra check: verificamos que lo que hemos encontrado no sea parte de otro email
-                # Ejemplo: buscamos "ana@test.com" y encontramos "mariana@test.com".
-                # Para evitar esto, verificamos que el email exacto esté en alguna de las partes
-                for part in parts:
-                    if part.lower() == search_email:
-                        return parts[0] # Retornamos el UID (primera columna)
-                
-                # Si no encontramos match exacto en las partes, puede ser un formato raro,
-                # pero si 'search_email' está en la línea, devolvemos el primer elemento (UID) con confianza.
-                return parts[0]
-            
+    # Equivalente a NR>2
+    lines = output.splitlines()[2:]
+
+    for line in lines:
+        if not line.strip():
+            continue
+
+        # Equivalente a {print $1}
+        return line.split()[0]
+
     return None

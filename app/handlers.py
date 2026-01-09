@@ -112,7 +112,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 f"📢 **Nuevo usuario registrado**\n"
                 f"El usuario de Telegram **{telegram_user_name}** acaba de crear una cuenta."
             )
-            await context.bot.send_message(chat_id=ADMIN_GROUP_ID, text=msg_group, parse_mode=ParseMode.MARKDOWN)
+            await context.bot.send_message(chat_id=ADMIN_GROUP_ID, text=msg_group, parse_mode=ParseMode.MARKDOWN, silent=True)
         except Exception:
             pass
 

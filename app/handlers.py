@@ -51,7 +51,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         " - Para crear: `/crear Tunombre Tupellido tuemail@ejemplo.com`\n"
         " - Para borrar: `/baja tuemail@ejemplo.com`\n"
         " - Restaurar contraseña: `/reset tuemail@ejemplo.com`\n"
-        "Debes escribir el comando como en el ejemplo con tus propios datos."
+        "Debes escribir el comando como en el ejemplo con tus propios datos.",
         parse_mode=ParseMode.MARKDOWN
     )
 

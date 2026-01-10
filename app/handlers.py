@@ -48,7 +48,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.effective_message.reply_text(
         "👋 **Gestión de Usuarios**\n\n"
-        " - Para crear: `/crear Tunombre Tupellido tuemail@ejemplo.com`\n"
+        " - Para crear: `/crear Tunombre Tuapellido tuemail@ejemplo.com`\n"
         " - Para borrar: `/baja tuemail@ejemplo.com`\n"
         " - Restaurar contraseña: `/reset tuemail@ejemplo.com`\n"
         "Debes escribir el comando como en el ejemplo con tus propios datos.",

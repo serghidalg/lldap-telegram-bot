@@ -16,7 +16,7 @@ async def get_id_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # --- UTILIDAD: SERVICES ---
 async def services_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
-    await update.effective_message.reply_text(SERVICES_LIST, parse_mode='Markdown')
+    await update.effective_message.reply_text(SERVICES_LIST, parse_mode='Markdown', disable_web_page_preview=True)
 
 # --- UTILIDAD: DESCRIPTION ---
 async def info_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -47,10 +47,11 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.effective_message.reply_text(
-        "👋 **Gestión de Usuarios LLDAP**\n\n"
-        " - Para crear: `/crear Nombre Apellido email`\n"
-        " - Para borrar: `/baja email@usuario.com`\n"
-        " - Restaurar contraseña: `/reset email@usuario.com`\n",
+        "👋 **Gestión de Usuarios**\n\n"
+        " - Para crear: `/crear Tunombre Tupellido tuemail@ejemplo.com`\n"
+        " - Para borrar: `/baja tuemail@ejemplo.com`\n"
+        " - Restaurar contraseña: `/reset tuemail@ejemplo.com`\n"
+        "Debes escribir el comando como en el ejemplo con tus propios datos."
         parse_mode=ParseMode.MARKDOWN
     )
 
@@ -61,7 +62,7 @@ async def create_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     args = context.args
     if len(args) < 3:
-        await update.effective_message.reply_text("⚠️ Uso: `/crear Nombre Apellido email@ejemplo.com`")
+        await update.effective_message.reply_text("⚠️ Uso: `/crear Tunombre Tupellido tuemail@ejemplo.com`")
         return
 
     # Limpiamos los datos: strip() quita espacios accidentales
@@ -123,7 +124,7 @@ async def delete_user_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     args = context.args
     if len(args) < 1:
-        await update.effective_message.reply_text("⚠️ Uso: `/baja email@ejemplo.com`")
+        await update.effective_message.reply_text("⚠️ Uso: `/baja tuemail@ejemplo.com`")
         return
 
     input_email = args[0].strip().lower()
@@ -150,7 +151,7 @@ async def reset_password_handler(update: Update, context: ContextTypes.DEFAULT_T
 
     args = context.args
     if len(args) < 1:
-        await update.effective_message.reply_text("⚠️ Uso: `/reset email@ejemplo.com`")
+        await update.effective_message.reply_text("⚠️ Uso: `/reset tuemail@ejemplo.com`")
         return
 
     input_email = args[0].strip().lower()
